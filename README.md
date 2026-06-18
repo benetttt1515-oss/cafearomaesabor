@@ -1,146 +1,296 @@
 # cofearomaesabor
 # cafearomaesabor
 
-☕ Café Aroma & Sabor - Sistema de Gestão de Estoque
-📋 Sobre o Projeto
+# ☕ Café Aroma & Sabor
 
-O Sistema de Gestão de Estoque Café Aroma & Sabor foi desenvolvido para solucionar os principais problemas enfrentados pela empresa na administração de seu almoxarifado.
+Sistema de Gestão de Estoque desenvolvido para automatizar o controle de produtos, movimentações e monitoramento de estoque mínimo.
 
-Antes da implementação do sistema, todo o controle era realizado por meio de planilhas manuais, causando dificuldades no gerenciamento de produtos, perdas financeiras devido ao vencimento de lotes, falta de mercadorias em estoque e ausência de rastreabilidade das movimentações.
+<p align="center">
+  <img src="screenshots/login.png" alt="Tela de Login" width="900">
+</p>
 
-A aplicação centraliza e automatiza o controle do estoque, permitindo maior eficiência operacional, redução de desperdícios e melhor tomada de decisões.
+<p align="center">
+  <strong>Sistema desenvolvido com Spring Boot e Spring Security</strong>
+</p>
 
-🎯 Objetivos:
+---
 
-Automatizar o controle de estoque.
-Registrar entradas e saídas de produtos.
-Controlar níveis mínimos de estoque.
-Emitir alertas para reposição de produtos.
-Garantir rastreabilidade completa das movimentações.
-Facilitar a consulta de informações pelo almoxarifado.
+## 📖 Sobre o Projeto
 
-🚀 Funcionalidades:
+A **Café Aroma & Sabor** é uma empresa especializada na distribuição de cafés especiais, grãos importados e produtos gourmet.
 
-📦 Cadastro de Produtos
+Antes da implementação deste sistema, o controle de estoque era realizado por meio de planilhas manuais, causando diversos problemas operacionais:
 
-Permite o gerenciamento completo dos produtos comercializados pela empresa.
+- Perda de produtos por falta de controle.
+- Falta de itens em estoque.
+- Dificuldade para rastrear movimentações.
+- Erros decorrentes de processos manuais.
+- Baixa visibilidade das operações do almoxarifado.
 
-Recursos:
-Cadastro de novos produtos.
-Edição de informações existentes.
-Exclusão de produtos.
-Consulta de produtos cadastrados.
-Controle de descrição e categoria.
-Definição de estoque mínimo por produto.
-Informações armazenadas:
-Nome do produto.
-Descrição.
-Categoria.
-Quantidade em estoque.
-Estoque mínimo.
-Data de cadastro.
+Para resolver esses desafios foi desenvolvido um sistema web capaz de centralizar e automatizar todas as operações relacionadas ao estoque.
 
-📥 Controle de Entrada de Produtos
+---
 
-Responsável por registrar a chegada de novos produtos ao estoque.
+# 🚀 Funcionalidades
 
-Recursos:
-Registro de entrada de mercadorias.
-Atualização automática do saldo em estoque.
-Associação da movimentação ao responsável.
-Registro da data e hora da operação.
-Benefícios:
-Evita divergências de estoque.
-Mantém histórico completo de reposições.
+## 🔐 Autenticação de Usuários
 
-📤 Controle de Saída de Produtos
+O sistema utiliza Spring Security para proteger o acesso às funcionalidades administrativas.
 
-Permite registrar a retirada de produtos do estoque.
+### Credenciais para demonstração
 
-Recursos:
-Registro de saídas.
-Atualização automática da quantidade disponível.
-Validação para impedir saídas superiores ao estoque disponível.
-Identificação do responsável pela movimentação.
-Benefícios:
-Redução de erros operacionais.
-Maior controle sobre perdas e consumo.
+```text
+Usuário: admin
+Senha: admin
+```
 
-🚨 Monitoramento de Estoque Mínimo
+### Tela de Login
 
-Sistema responsável por identificar produtos que necessitam de reposição.
+<p align="center">
+  <img src="screenshots/login.png" alt="Tela de Login" width="900">
+</p>
 
-Recursos:
-Configuração de estoque mínimo individual.
-Verificação automática dos níveis de estoque.
-Emissão de alertas quando a quantidade disponível atingir ou ficar abaixo do limite definido.
-Benefícios:
-Evita falta de produtos.
-Mantém os itens mais vendidos sempre disponíveis.
-Auxilia no planejamento de compras.
+---
 
-🔎 Rastreabilidade de Movimentações
+## 📊 Dashboard
 
-Todas as operações realizadas no sistema são registradas para consulta posterior.
+O dashboard apresenta uma visão geral do sistema, permitindo acompanhar rapidamente as informações mais importantes do estoque.
 
-Informações registradas:
-Produto movimentado.
-Tipo de movimentação (entrada ou saída).
-Quantidade movimentada.
-Usuário responsável.
-Data da operação.
-Horário da operação.
-Benefícios:
-Auditoria completa das operações.
-Identificação rápida de inconsistências.
-Transparência nos processos internos.
+### Recursos
 
-📜 Histórico de Movimentações
+- Resumo dos produtos cadastrados.
+- Indicadores do estoque.
+- Acesso rápido às funcionalidades.
+- Monitoramento geral das operações.
 
-Tela destinada à visualização do histórico completo de operações realizadas no estoque.
+<p align="center">
+  <img src="screenshots/dashboard.png" alt="Dashboard" width="900">
+</p>
 
-Recursos:
-Consulta de movimentações.
-Histórico cronológico.
-Visualização detalhada de cada operação.
-Busca e filtragem de registros.
-Benefícios:
-Facilidade na análise de movimentações.
-Melhor acompanhamento das atividades do estoque.
+---
 
-🏗️ Regras de Negócio
+## 📦 Gestão de Produtos
 
-Controle de Estoque
-O estoque não pode assumir valores negativos.
-Toda entrada aumenta automaticamente a quantidade disponível.
-Toda saída reduz automaticamente a quantidade disponível.
-Controle de Alertas
-Um alerta é gerado sempre que o estoque estiver abaixo do mínimo configurado.
-Os alertas permanecem ativos até a reposição do produto.
-Controle de Histórico
-Nenhuma movimentação é perdida após ser registrada.
-Todas as operações ficam disponíveis para consulta.
+Permite o cadastro e gerenciamento completo dos produtos disponíveis no estoque.
 
-📈 Benefícios Obtidos
+### Funcionalidades
 
-Com a utilização do sistema, a empresa passa a contar com:
+- Cadastro de produtos.
+- Edição de informações.
+- Exclusão de registros.
+- Consulta rápida.
+- Controle de quantidade disponível.
+- Configuração de estoque mínimo.
 
-Redução de perdas por vencimento ou esquecimento de produtos.
-Melhor organização do almoxarifado.
-Controle eficiente das entradas e saídas.
-Maior disponibilidade dos produtos mais vendidos.
-Rastreabilidade completa das operações.
-Maior confiabilidade das informações do estoque.
+### Informações armazenadas
 
-🖥️ Fluxo de Utilização
+- Nome do produto.
+- Descrição.
+- Categoria.
+- Quantidade em estoque.
+- Estoque mínimo.
 
-Cadastrar os produtos.
-Definir o estoque mínimo para cada item.
-Registrar entradas de mercadorias.
-Registrar saídas conforme a movimentação do estoque.
-Monitorar os alertas de estoque mínimo.
-Consultar o histórico sempre que necessário.
+<p align="center">
+  <img src="screenshots/produtos.png" alt="Gestão de Produtos" width="900">
+</p>
 
-📊 Resultado
+---
 
-O sistema fornece uma solução simples, intuitiva e eficiente para o gerenciamento do estoque da Café Aroma & Sabor, substituindo processos manuais por um controle automatizado, seguro e rastreável, contribuindo diretamente para a redução de perdas e melhoria da gestão operacional da empresa.
+## 📋 Gestão de Estoque
+
+Responsável pelo controle das movimentações de entrada e saída de produtos.
+
+### Entrada de Produtos
+
+- Registro de reposições.
+- Atualização automática do estoque.
+- Registro do responsável pela movimentação.
+- Histórico completo das entradas.
+
+### Saída de Produtos
+
+- Registro de retiradas.
+- Atualização automática da quantidade disponível.
+- Validação para impedir estoque negativo.
+- Controle completo das movimentações.
+
+### Benefícios
+
+- Maior controle operacional.
+- Redução de erros.
+- Histórico centralizado.
+- Melhor rastreabilidade.
+
+<p align="center">
+  <img src="screenshots/gestao.png" alt="Gestão de Estoque" width="900">
+</p>
+
+---
+
+## 🚨 Controle de Estoque Mínimo
+
+O sistema monitora automaticamente os níveis de estoque dos produtos cadastrados.
+
+Quando a quantidade disponível atinge ou fica abaixo do valor mínimo configurado, alertas são gerados para auxiliar o processo de reposição.
+
+### Benefícios
+
+- Evita falta de produtos.
+- Reduz perda de vendas.
+- Auxilia no planejamento de compras.
+- Mantém produtos populares disponíveis.
+
+---
+
+## 📜 Histórico e Rastreabilidade
+
+Todas as movimentações realizadas no sistema são registradas automaticamente.
+
+Cada registro contém:
+
+- Produto movimentado.
+- Tipo da movimentação.
+- Quantidade.
+- Usuário responsável.
+- Data da operação.
+- Horário da operação.
+
+Isso permite identificar rapidamente qualquer alteração realizada no estoque.
+
+---
+
+## 🔒 Segurança
+
+O sistema utiliza Spring Security para garantir acesso seguro às funcionalidades administrativas.
+
+### Recursos implementados
+
+- Autenticação de usuários.
+- Controle de acesso.
+- Proteção de rotas.
+- Sessões seguras.
+
+---
+
+## ⚙️ Regras de Negócio
+
+### Controle de Estoque
+
+- Não é permitido estoque negativo.
+- Entradas aumentam automaticamente o saldo disponível.
+- Saídas reduzem automaticamente a quantidade em estoque.
+
+### Controle de Alertas
+
+- Um alerta é gerado quando o estoque fica abaixo do mínimo configurado.
+- O alerta permanece ativo até que a reposição seja realizada.
+
+### Controle de Histórico
+
+- Nenhuma movimentação é removida após registro.
+- Todos os registros permanecem disponíveis para consulta.
+
+---
+
+## 🏗️ Arquitetura
+
+```text
+Controller
+    ↓
+Service
+    ↓
+Repository
+    ↓
+Banco de Dados
+```
+
+### Camadas
+
+**Controller**
+- Recebe as requisições da interface.
+
+**Service**
+- Implementa as regras de negócio.
+
+**Repository**
+- Responsável pela persistência dos dados.
+
+**Database**
+- Armazena produtos, usuários e movimentações.
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+- Java
+- Spring Boot
+- Spring Security
+- Spring Data JPA
+- Hibernate
+- Thymeleaf
+- MySQL
+- Maven
+- HTML5
+- CSS3
+- JavaScript
+- Bootstrap
+
+---
+
+## ▶️ Como Executar
+
+### Clonar o Repositório
+
+```bash
+git clone https://github.com/seu-usuario/cafe-aroma-sabor.git
+```
+
+### Entrar na Pasta
+
+```bash
+cd cafe-aroma-sabor
+```
+
+### Executar o Projeto
+
+```bash
+mvn spring-boot:run
+```
+
+### Acessar
+
+```text
+http://localhost:8080
+```
+
+---
+
+## 📈 Benefícios Obtidos
+
+✅ Controle centralizado do estoque
+
+✅ Redução de perdas operacionais
+
+✅ Monitoramento automático
+
+✅ Rastreabilidade completa
+
+✅ Histórico de movimentações
+
+✅ Maior produtividade
+
+✅ Segurança das informações
+
+✅ Facilidade de utilização
+
+---
+
+## 👨‍💻 Desenvolvedor
+
+Desenvolvido por **Benett Rezende** como solução para o desafio de gestão de estoque da empresa fictícia **Café Aroma & Sabor**.
+
+---
+
+<p align="center">
+  ☕ Café Aroma & Sabor • Sistema de Gestão de Estoque
+</p>
