@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- ============================================================
+         CAFÉ AROMA & SABOR — Sistema de Gestão de Estoque
+         dashboard.html — Tela Principal / Dashboard
+         ============================================================ -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — Café Aroma &amp; Sabor</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Estilos específicos do dashboard -->
+    <style>
+        /* Saudação no topo do corpo */
+        .saudacao {
+            margin-bottom: var(--gap-xl);
+        }
+        .saudacao-titulo {
+            font-family: var(--fonte-display);
+            font-size: 1.6rem;
+            color: var(--cafe-escuro);
+            font-weight: 700;
+            display: block;
+        }
+        .saudacao-data {
+            font-size: 0.82rem;
+            color: var(--cafe-claro);
+            margin-top: 3px;
+        }
+
+        /* Área de alertas de estoque mínimo */
+        .area-alertas {
+            background: var(--branco-puro);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(212,184,150,.25);
+            box-shadow: var(--sombra-sutil);
+            margin-bottom: var(--gap-xl);
+            overflow: hidden;
+        }
+
+        /* Grid de 2 colunas para seções inferiores */
+        .grade-dupla {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--gap-xl);
+            margin-bottom: var(--gap-xl);
+        }
+
+        @media (max-width: 900px) {
+            .grade-dupla { grid-template-columns: 1fr; }
+        }
+
+        /* Link de ação rápida nos cards */
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: var(--gap-md);
+            font-size: 0.78rem;
+            color: var(--cafe-suave);
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .card-link:hover { color: var(--cafe-medio); }
+
+        /* Tabela compacta de produtos mais movimentados */
+        .tabela-compacta tbody td { padding: 10px 14px; }
+
+        /* Linha do gráfico de barras simples */
+        .grafico-barra {
+            margin-bottom: var(--gap-md);
+        }
+        .grafico-barra-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--cafe-medio);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .grafico-barra-bg {
+            height: 8px;
+            background: var(--bege-medio);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .grafico-barra-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--cafe-medio), var(--cafe-suave));
+            transition: width 1.2s ease;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── OVERLAY MOBILE (fecha sidebar ao clicar fora) ─────────── -->
+<div id="sidebar-overlay" style="
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.45);
+  z-index:99; opacity:0; transition: opacity .3s ease;"
+     class="sidebar-overlay"></div>
+
+<style>
+    #sidebar-overlay.visivel { display:block !important; opacity:1; }
+</style>
+
+<!-- ── LAYOUT PRINCIPAL ───────────────────────────────────────── -->
+<div class="app-container">
+
+    <!-- ═══════════════════════════════════════
+         SIDEBAR — Navegação lateral
+    ════════════════════════════════════════ -->
+    <aside class="sidebar" role="navigation" aria-label="Menu principal">
+
+        <!-- Logo na sidebar -->
+        <div class="sidebar-logo">
+            <span class="sidebar-logo-icone" aria-hidden="true">☕</span>
+            <span class="sidebar-logo-nome">Café Aroma &amp; Sabor</span>
+            <span class="sidebar-logo-tag">Gestão de Estoque</span>
+        </div>
+
+        <!-- Itens de navegação -->
+        <nav class="sidebar-nav">
+
+            <span class="sidebar-nav-secao">Principal</span>
+
+            <a href="/dashboard" class="sidebar-nav-item ativo">
+                <span class="sidebar-nav-icone" aria-hidden="true">🏠</span>
+                Dashboard
+            </a>
+
+            <span class="sidebar-nav-secao">Gerenciamento</span>
+
+            <a href="/produtos" class="sidebar-nav-item">
+                <span class="sidebar-nav-icone" aria-hidden="true">📦</span>
+                Cadastro de Produtos
+            </a>
+
+            <a href="/estoque" class="sidebar-nav-item">
+                <span class="sidebar-nav-icone" aria-hidden="true">📊</span>
+                Gestão de Estoque
+            </a>
+
+        </nav>
+
+        <!-- Rodapé da sidebar: usuário + logout -->
+        <div class="sidebar-rodape">
+            <div class="sidebar-usuario">
+                <div class="sidebar-avatar" aria-hidden="true">AD</div>
+                <div>
+                    <span class="sidebar-usuario-nome">Administrador</span>
+                    <span class="sidebar-usuario-cargo">Gerente de Almoxarifado</span>
+                </div>
+            </div>
+            <button class="btn-logout" aria-label="Sair do sistema">
+                🚪 Sair do Sistema
+            </button>
+        </div>
+
+    </aside>
+    <!-- /SIDEBAR -->
+
+    <!-- ═══════════════════════════════════════
+         CONTEÚDO PRINCIPAL
+    ════════════════════════════════════════ -->
+    <div class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <!-- Botão menu mobile -->
+            <button id="btn-menu-mobile" style="
+        display:none; background:none; border:none;
+        font-size:1.4rem; color:var(--cafe-escuro); padding:4px;
+        @media(max-width:768px){display:block;}"
+                    aria-label="Abrir menu">☰</button>
+
+            <div>
+                <h1 class="topbar-titulo">Dashboard</h1>
+                <p class="topbar-subtitulo">Visão geral do almoxarifado</p>
+            </div>
+
+            <div class="topbar-direita">
+                <!-- Badge do usuário logado -->
+                <div class="topbar-usuario-badge" aria-label="Usuário logado">
+                    <span aria-hidden="true">👤</span>
+                    <span>Usuário Logado: <strong>Administrador</strong></span>
+                </div>
+                <!-- Botão logout rápido no topbar -->
+                <button class="btn-logout" style="
+          width:auto; padding:8px 14px; font-size:0.8rem;"
+                        aria-label="Sair do sistema">
+                    🚪 Logout
+                </button>
+            </div>
+        </header>
+        <!-- /TOPBAR -->
+
+        <!-- CORPO DA PÁGINA -->
+        <main class="pagina-corpo">
+
+            <!-- Saudação -->
+            <div class="saudacao">
+                <span class="saudacao-titulo">☕ Bom dia, Administrador!</span>
+                <span class="saudacao-data" id="data-atual">Carregando data…</span>
+            </div>
+
+            <!-- ── CARDS INFORMATIVOS ───────────────────────────────── -->
+            <section aria-label="Indicadores">
+                <div class="cards-grid">
+
+                    <!-- Card 1: Total de Produtos -->
+                    <div class="card card-marrom animar-entrada animar-entrada-1">
+                        <span class="card-icone" aria-hidden="true">📦</span>
+                        <span class="card-valor">247</span>
+                        <span class="card-rotulo">Total de Produtos Cadastrados</span>
+                        <span class="card-tendencia tendencia-positiva">▲ +12 este mês</span>
+                        <br/>
+                        <a href="/produtos" class="card-link">Ver produtos →</a>
+                    </div>
+
+                    <!-- Card 2: Produtos com Estoque Baixo -->
+                    <div class="card card-alerta animar-entrada animar-entrada-2">
+                        <span class="card-icone" aria-hidden="true">⚠️</span>
+                        <span class="card-valor" style="color:var(--vermelho-alert);">8</span>
+                        <span class="card-rotulo">Produtos com Estoque Abaixo do Mínimo</span>
+                        <span class="card-tendencia tendencia-alerta">▲ +3 desde ontem</span>
+                        <br/>
+                        <a href="/estoque" class="card-link">Gerenciar estoque →</a>
+                    </div>
+
+                    <!-- Card 3: Movimentações Recentes -->
+                    <div class="card card-caramelo animar-entrada animar-entrada-3">
+                        <span class="card-icone" aria-hidden="true">🔄</span>
+                        <span class="card-valor">34</span>
+                        <span class="card-rotulo">Movimentações nos Últimos 7 Dias</span>
+                        <span class="card-tendencia tendencia-neutra">► Estável</span>
+                        <br/>
+                        <a href="/estoque" class="card-link">Ver histórico →</a>
+                    </div>
+
+                    <!-- Card 4: Valor Total em Estoque -->
+                    <div class="card card-verde animar-entrada animar-entrada-4">
+                        <span class="card-icone" aria-hidden="true">✅</span>
+                        <span class="card-valor">239</span>
+                        <span class="card-rotulo">Produtos com Estoque Regular</span>
+                        <span class="card-tendencia tendencia-positiva">✔ Situação Saudável</span>
+                        <br/>
+                        <a href="/produtos" class="card-link">Ver todos →</a>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ── ÁREA DE ALERTAS DE ESTOQUE MÍNIMO ──────────────── -->
+            <section class="area-alertas secao" aria-label="Alertas de estoque mínimo">
+                <div class="secao-cabecalho">
+                    <h2 class="secao-titulo">
+                        <span class="secao-titulo-icone" aria-hidden="true">🔔</span>
+                        Alertas de Estoque Mínimo
+                    </h2>
+                    <span class="badge badge-alerta">8 alertas ativos</span>
+                </div>
+
+                <div class="secao-corpo">
+
+                    <!-- Alerta crítico -->
+                    <div class="alerta-estoque alerta-critico" role="alert">
+                        <span class="alerta-icone" aria-hidden="true">🚨</span>
+                        <div class="alerta-texto">
+                            <strong>Café Grão Especial (Arabica) — Estoque CRÍTICO</strong>
+                            <span>Quantidade atual: 2 kg · Estoque mínimo: 10 kg · Lote: L2025-04A</span>
+                        </div>
+                    </div>
+
+                    <!-- Alerta atenção -->
+                    <div class="alerta-estoque alerta-atencao" role="alert">
+                        <span class="alerta-icone" aria-hidden="true">⚠️</span>
+                        <div class="alerta-texto">
+                            <strong>Filtro de Papel (Tamanho 103) — Estoque Baixo</strong>
+                            <span>Quantidade atual: 150 un. · Estoque mínimo: 200 un. · Lote: L2025-03C</span>
+                        </div>
+                    </div>
+
+                    <!-- Alerta atenção 2 -->
+                    <div class="alerta-estoque alerta-atencao" role="alert">
+                        <span class="alerta-icone" aria-hidden="true">⚠️</span>
+                        <div class="alerta-texto">
+                            <strong>Copo Descartável 150ml — Estoque Baixo</strong>
+                            <span>Quantidade atual: 80 un. · Estoque mínimo: 200 un. · Lote: L2025-04B</span>
+                        </div>
+                    </div>
+
+                    <!-- Alerta OK -->
+                    <div class="alerta-estoque alerta-ok" role="status">
+                        <span class="alerta-icone" aria-hidden="true">✅</span>
+                        <div class="alerta-texto">
+                            <strong>239 produtos com estoque dentro do limite</strong>
+                            <span>Sem necessidade de reposição imediata.</span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ── GRADE INFERIOR: MOVIMENTAÇÕES + GRÁFICO ────────── -->
+            <div class="grade-dupla">
+
+                <!-- Movimentações Recentes -->
+                <section class="secao" aria-label="Movimentações recentes">
+                    <div class="secao-cabecalho">
+                        <h2 class="secao-titulo">
+                            <span class="secao-titulo-icone" aria-hidden="true">🔄</span>
+                            Movimentações Recentes
+                        </h2>
+                        <a href="/estoque" class="badge badge-cafe" style="text-decoration:none;">
+                            Ver todas →
+                        </a>
+                    </div>
+                    <div class="secao-corpo" style="padding-top:0; padding-bottom:0;">
+                        <ul class="movimentacao-lista" aria-label="Lista de movimentações recentes">
+
+                            <li class="movimentacao-item">
+                                <div class="mov-indicador mov-entrada" aria-label="Entrada">⬆</div>
+                                <div class="mov-info">
+                                    <p class="mov-produto">Café Grão Especial (Arabica)</p>
+                                    <p class="mov-detalhe">Entrada · Carlos Mendes</p>
+                                </div>
+                                <div class="mov-meta">
+                                    <span class="mov-qtd mov-qtd-positivo">+50 kg</span>
+                                    <span class="mov-data">14/07/2025</span>
+                                </div>
+                            </li>
+
+                            <li class="movimentacao-item">
+                                <div class="mov-indicador mov-saida" aria-label="Saída">⬇</div>
+                                <div class="mov-info">
+                                    <p class="mov-produto">Filtro de Papel (103)</p>
+                                    <p class="mov-detalhe">Saída · Ana Ribeiro</p>
+                                </div>
+                                <div class="mov-meta">
+                                    <span class="mov-qtd mov-qtd-negativo">-30 un.</span>
+                                    <span class="mov-data">14/07/2025</span>
+                                </div>
+                            </li>
+
+                            <li class="movimentacao-item">
+                                <div class="mov-indicador mov-entrada" aria-label="Entrada">⬆</div>
+                                <div class="mov-info">
+                                    <p class="mov-produto">Açúcar Cristal (Kg)</p>
+                                    <p class="mov-detalhe">Entrada · João Santos</p>
+                                </div>
+                                <div class="mov-meta">
+                                    <span class="mov-qtd mov-qtd-positivo">+100 kg</span>
+                                    <span class="mov-data">13/07/2025</span>
+                                </div>
+                            </li>
+
+                            <li class="movimentacao-item">
+                                <div class="mov-indicador mov-saida" aria-label="Saída">⬇</div>
+                                <div class="mov-info">
+                                    <p class="mov-produto">Copo Descartável 150ml</p>
+                                    <p class="mov-detalhe">Saída · Maria Souza</p>
+                                </div>
+                                <div class="mov-meta">
+                                    <span class="mov-qtd mov-qtd-negativo">-120 un.</span>
+                                    <span class="mov-data">13/07/2025</span>
+                                </div>
+                            </li>
+
+                            <li class="movimentacao-item">
+                                <div class="mov-indicador mov-entrada" aria-label="Entrada">⬆</div>
+                                <div class="mov-info">
+                                    <p class="mov-produto">Leite Integral (Litro)</p>
+                                    <p class="mov-detalhe">Entrada · Pedro Costa</p>
+                                </div>
+                                <div class="mov-meta">
+                                    <span class="mov-qtd mov-qtd-positivo">+200 L</span>
+                                    <span class="mov-data">12/07/2025</span>
+                                </div>
+                            </li>
+
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Gráfico de Consumo por Categoria -->
+                <section class="secao" aria-label="Consumo por categoria">
+                    <div class="secao-cabecalho">
+                        <h2 class="secao-titulo">
+                            <span class="secao-titulo-icone" aria-hidden="true">📈</span>
+                            Consumo por Categoria (Mês)
+                        </h2>
+                    </div>
+                    <div class="secao-corpo">
+
+                        <!-- Barras de progresso por categoria -->
+                        <div class="grafico-barra">
+                            <div class="grafico-barra-label">
+                                <span>☕ Café e Derivados</span>
+                                <span>38%</span>
+                            </div>
+                            <div class="grafico-barra-bg">
+                                <div class="grafico-barra-fill" style="width:38%;" aria-valuenow="38" aria-valuemin="0" aria-valuemax="100" role="progressbar"></div>
+                            </div>
+                        </div>
+
+                        <div class="grafico-barra">
+                            <div class="grafico-barra-label">
+                                <span>🧾 Embalagens</span>
+                                <span>24%</span>
+                            </div>
+                            <div class="grafico-barra-bg">
+                                <div class="grafico-barra-fill" style="width:24%; background:linear-gradient(90deg,var(--cafe-suave),var(--bege-escuro));" role="progressbar"></div>
+                            </div>
+                        </div>
+
+                        <div class="grafico-barra">
+                            <div class="grafico-barra-label">
+                                <span>🥛 Laticínios</span>
+                                <span>19%</span>
+                            </div>
+                            <div class="grafico-barra-bg">
+                                <div class="grafico-barra-fill" style="width:19%; background:linear-gradient(90deg,var(--azul-info),#5590c0);" role="progressbar"></div>
+                            </div>
+                        </div>
+
+                        <div class="grafico-barra">
+                            <div class="grafico-barra-label">
+                                <span>🧹 Limpeza</span>
+                                <span>12%</span>
+                            </div>
+                            <div class="grafico-barra-bg">
+                                <div class="grafico-barra-fill" style="width:12%; background:linear-gradient(90deg,var(--verde-ok),#6aad7e);" role="progressbar"></div>
+                            </div>
+                        </div>
+
+                        <div class="grafico-barra">
+                            <div class="grafico-barra-label">
+                                <span>🍬 Outros Insumos</span>
+                                <span>7%</span>
+                            </div>
+                            <div class="grafico-barra-bg">
+                                <div class="grafico-barra-fill" style="width:7%; background:linear-gradient(90deg,var(--amarelo-warn),#d4a537);" role="progressbar"></div>
+                            </div>
+                        </div>
+
+                        <hr class="divider" />
+
+                        <!-- Resumo numérico rápido -->
+                        <div class="resumo-grid">
+                            <div class="resumo-item">
+                                <span class="resumo-valor">12</span>
+                                <span class="resumo-rotulo">Categorias</span>
+                            </div>
+                            <div class="resumo-item">
+                                <span class="resumo-valor" style="color:var(--vermelho-alert);">8</span>
+                                <span class="resumo-rotulo">Em Alerta</span>
+                            </div>
+                            <div class="resumo-item">
+                                <span class="resumo-valor" style="color:var(--verde-ok);">34</span>
+                                <span class="resumo-rotulo">Moviment.</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+            <!-- /GRADE DUPLA -->
+
+        </main>
+        <!-- /CORPO -->
+
+        <!-- RODAPÉ -->
+        <footer class="pagina-rodape">
+            © 2025 Café Aroma &amp; Sabor · Sistema de Gestão de Estoque · Desenvolvido para uso interno
+        </footer>
+
+    </div>
+    <!-- /MAIN-CONTENT -->
+
+</div>
+<!-- /APP-CONTAINER -->
+
+<script src="script.js"></script>
+<script>
+    /* Exibe a data atual na saudação */
+    const dataAtual = document.getElementById('data-atual');
+    if (dataAtual) {
+        const agora = new Date();
+        const opcoes = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+        dataAtual.textContent = agora.toLocaleDateString('pt-BR', opcoes);
+    }
+
+    /* Exibe o botão de menu mobile em telas menores */
+    const btnMenu = document.getElementById('btn-menu-mobile');
+    if (btnMenu && window.innerWidth <= 768) {
+        btnMenu.style.display = 'block';
+    }
+</script>
+</body>
+</html>

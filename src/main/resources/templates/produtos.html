@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <!-- ============================================================
+         CAFÉ AROMA & SABOR — Sistema de Gestão de Estoque
+         produtos.html — Cadastro de Produtos (CRUD Visual)
+         ============================================================ -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro de Produtos — Café Aroma &amp; Sabor</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        /* Contador de resultados */
+        .contagem-resultados {
+            font-size: 0.78rem;
+            color: var(--cafe-claro);
+            font-weight: 500;
+        }
+
+        /* Célula especial: indicador de estoque */
+        .estoque-celula { min-width: 110px; }
+
+        /* Linha destacada (novo registro) */
+        tr.novo-registro {
+            background: rgba(74,124,89,.06) !important;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Overlay mobile -->
+<div id="sidebar-overlay" style="
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.45);
+  z-index:99; opacity:0; transition: opacity .3s ease;" ></div>
+<style>#sidebar-overlay.visivel { display:block !important; opacity:1; }</style>
+
+<!-- ── LAYOUT PRINCIPAL ───────────────────────────────────────── -->
+<div class="app-container">
+
+    <!-- ═══════════════════════════════════════
+         SIDEBAR
+    ════════════════════════════════════════ -->
+    <aside class="sidebar" role="navigation" aria-label="Menu principal">
+        <div class="sidebar-logo">
+            <span class="sidebar-logo-icone" aria-hidden="true">☕</span>
+            <span class="sidebar-logo-nome">Café Aroma &amp; Sabor</span>
+            <span class="sidebar-logo-tag">Gestão de Estoque</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <span class="sidebar-nav-secao">Principal</span>
+            <a href="/dashboard" class="sidebar-nav-item">
+                <span class="sidebar-nav-icone" aria-hidden="true">🏠</span>
+                Dashboard
+            </a>
+            <span class="sidebar-nav-secao">Gerenciamento</span>
+            <a href="/produtos" class="sidebar-nav-item ativo">
+                <span class="sidebar-nav-icone" aria-hidden="true">📦</span>
+                Cadastro de Produtos
+            </a>
+            <a href="/estoque" class="sidebar-nav-item">
+                <span class="sidebar-nav-icone" aria-hidden="true">📊</span>
+                Gestão de Estoque
+            </a>
+        </nav>
+
+        <div class="sidebar-rodape">
+            <div class="sidebar-usuario">
+                <div class="sidebar-avatar" aria-hidden="true">AD</div>
+                <div>
+                    <span class="sidebar-usuario-nome">Administrador</span>
+                    <span class="sidebar-usuario-cargo">Gerente de Almoxarifado</span>
+                </div>
+            </div>
+            <button class="btn-logout" aria-label="Sair do sistema">🚪 Sair do Sistema</button>
+        </div>
+    </aside>
+
+    <!-- ═══════════════════════════════════════
+         CONTEÚDO PRINCIPAL
+    ════════════════════════════════════════ -->
+    <div class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <button id="btn-menu-mobile" style="display:none; background:none; border:none;
+        font-size:1.4rem; color:var(--cafe-escuro); padding:4px;" aria-label="Abrir menu">☰</button>
+            <div>
+                <h1 class="topbar-titulo">Cadastro de Produtos</h1>
+                <p class="topbar-subtitulo">Gerencie o catálogo de itens do almoxarifado</p>
+            </div>
+            <div class="topbar-direita">
+                <div class="topbar-usuario-badge">
+                    <span aria-hidden="true">👤</span>
+                    <span>Usuário Logado: <strong>Administrador</strong></span>
+                </div>
+                <button class="btn-logout" style="width:auto; padding:8px 14px; font-size:0.8rem;">🚪 Logout</button>
+            </div>
+        </header>
+
+        <!-- CORPO -->
+        <main class="pagina-corpo">
+
+            <!-- ══════════════════════════════════
+                 SEÇÃO: FORMULÁRIO DE CADASTRO
+            ══════════════════════════════════ -->
+            <section class="secao" aria-label="Formulário de cadastro de produto">
+                <div class="secao-cabecalho">
+                    <h2 class="secao-titulo">
+                        <span class="secao-titulo-icone" aria-hidden="true">➕</span>
+                        Novo Produto / Editar Produto
+                    </h2>
+                    <span class="badge badge-cafe">Formulário de Cadastro</span>
+                </div>
+
+                <div class="secao-corpo">
+                    <form th:object="${produtoForm}" th:action="@{/produtos}" method="post" id="form-produto" novalidate>
+                        <input type="hidden" th:field="*{id}" />
+                        <!-- Grade de campos do formulário -->
+                        <div class="form-grid form-grid-3">
+
+                            <!-- Nome do produto -->
+                            <div class="form-campo span-2">
+                                <label class="form-label" for="prod-nome">Nome do Produto *</label>
+                                <input
+                                        class="form-input"
+                                        type="text"
+                                        id="prod-nome"
+                                        th:field="*{nome}"
+                                        placeholder="Ex.: Café Grão Especial Arabica"
+                                />
+                            </div>
+
+                            <!-- Categoria -->
+                            <div class="form-campo">
+                                <label class="form-label" for="prod-categoria">Categoria *</label>
+                                <select class="form-select" id="prod-categoria" th:field="*{categoria}">
+                                    <option value="">Selecione…</option>
+                                    <option value="cafe">☕ Café e Derivados</option>
+                                    <option value="laticinios">🥛 Laticínios</option>
+                                    <option value="embalagens">🧾 Embalagens</option>
+                                    <option value="limpeza">🧹 Limpeza</option>
+                                    <option value="utensilios">🍴 Utensílios</option>
+                                    <option value="acucar">🍬 Açúcar e Adoçantes</option>
+                                    <option value="filtros">🔽 Filtros</option>
+                                    <option value="outros">📁 Outros</option>
+                                </select>
+                            </div>
+
+                            <!-- Descrição -->
+                            <div class="form-campo span-3">
+                                <label class="form-label" for="prod-descricao">Descrição</label>
+                                <textarea
+                                        class="form-textarea"
+                                        id="prod-descricao"
+                                        th:field="*{descricao}"
+                                        placeholder="Descreva o produto, características, usos, etc."
+                                        rows="2"
+                                ></textarea>
+                            </div>
+
+                            <!-- Quantidade em estoque -->
+                            <div class="form-campo">
+                                <label class="form-label" for="prod-qtd">Quantidade em Estoque</label>
+                                <input
+                                        class="form-input"
+                                        type="number"
+                                        id="prod-qtd"
+                                        th:field="*{quantidade}"
+                                        placeholder="0"
+                                        min="0"
+                                />
+                            </div>
+
+                            <!-- Estoque mínimo -->
+                            <div class="form-campo">
+                                <label class="form-label" for="prod-min">Estoque Mínimo</label>
+                                <input
+                                        class="form-input"
+                                        type="number"
+                                        id="prod-min"
+                                        th:field="*{estoqueMinimo}"
+                                        placeholder="0"
+                                        min="0"
+                                />
+                            </div>
+
+                            <!-- Lote -->
+                            <div class="form-campo">
+                                <label class="form-label" for="prod-lote">Lote</label>
+                                <input
+                                        class="form-input"
+                                        type="text"
+                                        id="prod-lote"
+                                        th:field="*{lote}"
+                                        placeholder="Ex.: L2025-04A"
+                                />
+                            </div>
+
+                            <!-- Data de validade -->
+                            <div class="form-campo">
+                                <label class="form-label" for="prod-validade">Data de Validade</label>
+                                <input
+                                        class="form-input"
+                                        type="date"
+                                        id="prod-validade"
+                                        th:field="*{validade}"
+                                />
+                            </div>
+
+                            <!-- Fornecedor -->
+                            <div class="form-campo span-2">
+                                <label class="form-label" for="prod-fornecedor">Fornecedor</label>
+                                <input
+                                        class="form-input"
+                                        type="text"
+                                        id="prod-fornecedor"
+                                        th:field="*{fornecedor}"
+                                        placeholder="Nome do fornecedor ou empresa"
+                                />
+                            </div>
+
+                        </div>
+                        <!-- /form-grid -->
+
+                        <!-- Botões de ação do formulário -->
+                        <div class="form-rodape">
+                            <button type="submit" class="btn-primario-sm">
+                                💾 Salvar Produto
+                            </button>
+                            <button type="button" class="btn-secundario btn-limpar">
+                                🗑 Limpar Formulário
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+            <!-- /SEÇÃO FORMULÁRIO -->
+
+            <!-- ══════════════════════════════════
+                 SEÇÃO: TABELA DE PRODUTOS
+            ══════════════════════════════════ -->
+            <section class="secao" aria-label="Lista de produtos cadastrados">
+                <div class="secao-cabecalho">
+                    <h2 class="secao-titulo">
+                        <span class="secao-titulo-icone" aria-hidden="true">📋</span>
+                        Produtos Cadastrados
+                    </h2>
+
+                    <!-- Barra de busca + contador -->
+                    <div class="flex gap-md" style="align-items:center; flex-wrap:wrap; gap:12px;">
+            <span class="contagem-resultados" id="contagem-resultados">
+              Exibindo <strong>10</strong> produtos
+            </span>
+                        <div class="barra-busca-wrapper">
+                            <span class="barra-busca-icone" aria-hidden="true">🔍</span>
+                            <input
+                                    class="barra-busca"
+                                    type="search"
+                                    id="busca-produto"
+                                    placeholder="Buscar produto por nome…"
+                                    aria-label="Buscar produto"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="secao-corpo" style="padding: 0;">
+                    <div class="tabela-wrapper" style="padding: var(--xl);">
+                        <table class="tabela" id="tabela-produtos" aria-label="Lista de produtos">
+                            <thead>
+                            <tr>
+                                <th scope="col">Nome do Produto</th>
+                                <th scope="col">Categoria</th>
+                                <th scope="col">Quantidade</th>
+                                <th scope="col">Est. Mínimo</th>
+                                <th scope="col">Lote</th>
+                                <th scope="col">Validade</th>
+                                <th scope="col">Fornecedor</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Ações</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="p : ${produtos}">
+                                <td>
+                                    <p class="produto-nome" th:text="${p.nome}">Nome do produto</p>
+                                    <p class="produto-desc" th:text="${p.descricao}">Descrição</p>
+                                </td>
+                                <td><span class="badge" th:text="${p.categoria}">Categoria</span></td>
+                                <td class="estoque-celula">
+                                    <strong th:text="${p.quantidade}">0</strong>
+                                </td>
+                                <td th:text="${p.estoqueMinimo}">0</td>
+                                <td><code th:text="${p.lote}">Lote</code></td>
+                                <td th:text="${p.validade}">Validade</td>
+                                <td th:text="${p.fornecedor}">Fornecedor</td>
+                                <td>
+                                    <span class="badge" th:if="${p.quantidade &lt; p.estoqueMinimo}">⚠</span>
+                                    <span class="badge badge-ok" th:if="${p.quantidade >= p.estoqueMinimo}">✔</span>
+                                </td>
+                                <td>
+                                    <div class="acoes-grupo">
+                                        <a class="btn-acao btn-acao-editar" th:href="@{/produtos/edit/{id}(id=${p.id})}" aria-label="Editar produto">Editar</a>
+                                        <form th:action="@{/produtos/delete/{id}(id=${p.id})}" method="post" style="display:inline;">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                            <button class="btn-acao btn-acao-excluir" aria-label="Excluir produto">🗑️</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Mensagem de estado vazio (exibida pela busca via JS) -->
+                        <div id="estado-vazio-busca" style="display:none;" role="status">
+                            <div class="estado-vazio">
+                                <span class="estado-vazio-icone" aria-hidden="true">🔍</span>
+                                <p class="estado-vazio-texto">Nenhum produto encontrado para a busca realizada.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+            <!-- /SEÇÃO TABELA -->
+
+        </main>
+
+        <!-- RODAPÉ -->
+        <footer class="pagina-rodape">
+            © 2025 Café Aroma &amp; Sabor · Sistema de Gestão de Estoque · Desenvolvido para uso interno
+        </footer>
+
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+    /* Mostra botão menu mobile em telas pequenas */
+    const btnMenu = document.getElementById('btn-menu-mobile');
+    if (btnMenu && window.innerWidth <= 768) btnMenu.style.display = 'block';
+</script>
+</body>
+</html>
+
+
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <!-- ============================================================
+         CAFÉ AROMA & SABOR — Sistema de Gestão de Estoque
+         estoque.html — Gestão de Estoque e Movimentações
+         ============================================================ -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestão de Estoque — Café Aroma &amp; Sabor</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        /* Layout de duas colunas para esta página */
+        .grade-estoque {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: var(--gap-xl);
+            margin-bottom: var(--gap-xl);
+        }
+
+        @media (max-width: 1100px) {
+            .grade-estoque { grid-template-columns: 1fr; }
+        }
+
+        /* Linha destacada na tabela de estoque */
+        .linha-critica { background: rgba(139,46,46,.04) !important; }
+        .linha-alerta  { background: rgba(193,125,17,.04) !important; }
+
+        /* Coluna de quantidade com número grande */
+        .qtd-numero {
+            font-family: var(--fonte-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--cafe-escuro);
+        }
+
+        /* Tabela de estoque geral */
+        #tabela-estoque tbody td { padding: 11px 14px; }
+    </style>
+</head>
+<body>
+
+<!-- Overlay mobile -->
+<div id="sidebar-overlay" style="
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.45);
+  z-index:99; opacity:0; transition: opacity .3s ease;"></div>
+<style>#sidebar-overlay.visivel { display:block !important; opacity:1; }</style>
+
+<!-- ── LAYOUT PRINCIPAL ───────────────────────────────────────── -->
+<div class="app-container">
+
+    <!-- ═══════════════════════════════════════
+         SIDEBAR
+    ════════════════════════════════════════ -->
+    <aside class="sidebar" role="navigation" aria-label="Menu principal">
+        <div class="sidebar-logo">
+            <span class="sidebar-logo-icone" aria-hidden="true">☕</span>
+            <span class="sidebar-logo-nome">Café Aroma &amp; Sabor</span>
+            <span class="sidebar-logo-tag">Gestão de Estoque</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <span class="sidebar-nav-secao">Principal</span>
+            <a href="/dashboard" class="sidebar-nav-item">
+                <span class="sidebar-nav-icone" aria-hidden="true">🏠</span>
+                Dashboard
+            </a>
+            <span class="sidebar-nav-secao">Gerenciamento</span>
+            <a href="/produtos" class="sidebar-nav-item">
+                <span class="sidebar-nav-icone" aria-hidden="true">📦</span>
+                Cadastro de Produtos
+            </a>
+            <a href="/estoque" class="sidebar-nav-item ativo">
+                <span class="sidebar-nav-icone" aria-hidden="true">📊</span>
+                Gestão de Estoque
+            </a>
+        </nav>
+
+        <div class="sidebar-rodape">
+            <div class="sidebar-usuario">
+                <div class="sidebar-avatar" aria-hidden="true">AD</div>
+                <div>
+                    <span class="sidebar-usuario-nome">Administrador</span>
+                    <span class="sidebar-usuario-cargo">Gerente de Almoxarifado</span>
+                </div>
+            </div>
+            <button class="btn-logout" aria-label="Sair do sistema">🚪 Sair do Sistema</button>
+        </div>
+    </aside>
+
+    <!-- ═══════════════════════════════════════
+         CONTEÚDO PRINCIPAL
+    ════════════════════════════════════════ -->
+    <div class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <button id="btn-menu-mobile" style="display:none; background:none; border:none;
+        font-size:1.4rem; color:var(--cafe-escuro); padding:4px;" aria-label="Abrir menu">☰</button>
+            <div>
+                <h1 class="topbar-titulo">Gestão de Estoque</h1>
+                <p class="topbar-subtitulo">Controle de entradas, saídas e histórico de movimentações</p>
+            </div>
+            <div class="topbar-direita">
+                <div class="topbar-usuario-badge">
+                    <span aria-hidden="true">👤</span>
+                    <span>Usuário Logado: <strong>Administrador</strong></span>
+                </div>
+                <button class="btn-logout" style="width:auto; padding:8px 14px; font-size:0.8rem;">🚪 Logout</button>
+            </div>
+        </header>
+
+        <!-- CORPO -->
+        <main class="pagina-corpo">
+
+            <!-- ── CARDS DE RESUMO DO ESTOQUE ──────────────────────── -->
+            <section aria-label="Resumo do estoque">
+                <div class="cards-grid" style="grid-template-columns: repeat(4, 1fr);">
+
+                    <div class="card card-marrom animar-entrada animar-entrada-1">
+                        <span class="card-icone" aria-hidden="true">📦</span>
+                        <span class="card-valor">247</span>
+                        <span class="card-rotulo">Total de Itens</span>
+                    </div>
+
+                    <div class="card card-verde animar-entrada animar-entrada-2">
+                        <span class="card-icone" aria-hidden="true">⬆️</span>
+                        <span class="card-valor" style="color:var(--verde-ok);">18</span>
+                        <span class="card-rotulo">Entradas este Mês</span>
+                    </div>
+
+                    <div class="card card-alerta animar-entrada animar-entrada-3">
+                        <span class="card-icone" aria-hidden="true">⬇️</span>
+                        <span class="card-valor" style="color:var(--vermelho-alert);">16</span>
+                        <span class="card-rotulo">Saídas este Mês</span>
+                    </div>
+
+                    <div class="card card-warn animar-entrada animar-entrada-4">
+                        <span class="card-icone" aria-hidden="true">⚠️</span>
+                        <span class="card-valor" style="color:var(--amarelo-warn);">8</span>
+                        <span class="card-rotulo">Em Estoque Mínimo</span>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ── GRADE: FORMULÁRIO + TABELA DE ESTOQUE ──────────── -->
+            <div class="grade-estoque">
+
+                <!-- COLUNA ESQUERDA: Formulário de Movimentação -->
+                <section class="secao" aria-label="Registrar movimentação de estoque">
+                    <div class="secao-cabecalho">
+                        <h2 class="secao-titulo">
+                            <span class="secao-titulo-icone" aria-hidden="true">🔄</span>
+                            Registrar Movimentação
+                        </h2>
+                    </div>
+
+                    <div class="secao-corpo">
+                        <form th:action="@{/estoque}" method="post" id="form-movimentacao" novalidate>
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                            <!-- Produto -->
+                            <div class="form-campo" style="margin-bottom:var(--gap-md);">
+                                <label class="form-label" for="mov-produto">Produto *</label>
+                                <select class="form-select" id="mov-produto" name="produtoId" aria-required="true">
+                                    <option value="">Selecione o produto…</option>
+                                    <option th:each="p : ${produtos}" th:value="${p.id}" th:text="${p.nome}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Tipo de Movimentação (switch visual) -->
+                            <div class="form-campo" style="margin-bottom:var(--gap-md);">
+                                <label class="form-label">Tipo de Movimentação *</label>
+                                <div class="tipo-switch" role="group" aria-label="Tipo de movimentação">
+                                    <div class="tipo-opcao">
+                                        <input
+                                                type="radio"
+                                                id="tipo-entrada"
+                                                name="tipo"
+                                                value="entrada"
+                                                checked
+                                        />
+                                        <label for="tipo-entrada" class="entrada">
+                                            ⬆️ Entrada
+                                        </label>
+                                    </div>
+                                    <div class="tipo-opcao">
+                                        <input
+                                                type="radio"
+                                                id="tipo-saida"
+                                                name="tipo"
+                                                value="saida"
+                                        />
+                                        <label for="tipo-saida" class="saida">
+                                            ⬇️ Saída
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quantidade -->
+                            <div class="form-campo" style="margin-bottom:var(--gap-md);">
+                                <label class="form-label" for="mov-qtd">Quantidade *</label>
+                                <input
+                                        class="form-input"
+                                        type="number"
+                                        id="mov-qtd"
+                                        name="quantidade"
+                                        placeholder="0"
+                                        min="1"
+                                        aria-required="true"
+                                />
+                            </div>
+
+                            <!-- Data -->
+                            <div class="form-campo" style="margin-bottom:var(--gap-md);">
+                                <label class="form-label" for="mov-data">Data da Movimentação *</label>
+                                <input
+                                        class="form-input"
+                                        type="date"
+                                        id="mov-data"
+                                        name="data"
+                                        aria-required="true"
+                                />
+                            </div>
+
+                            <!-- Responsável -->
+                            <div class="form-campo" style="margin-bottom:var(--gap-md);">
+                                <label class="form-label" for="mov-responsavel">Responsável *</label>
+                                <input
+                                        class="form-input"
+                                        type="text"
+                                        id="mov-responsavel"
+                                        name="responsavel"
+                                        placeholder="Nome do responsável"
+                                        aria-required="true"
+                                />
+                            </div>
+
+                            <!-- Observações -->
+                            <div class="form-campo" style="margin-bottom:var(--gap-md);">
+                                <label class="form-label" for="mov-observacoes">Observações</label>
+                                <textarea
+                                        class="form-textarea"
+                                        id="mov-observacoes"
+                                        name="observacoes"
+                                        placeholder="Informações adicionais sobre a movimentação…"
+                                        rows="3"
+                                ></textarea>
+                            </div>
+
+                            <!-- Botões -->
+                            <div class="form-rodape" style="margin-top:var(--gap-md); padding-top:var(--gap-md);">
+                                <button type="submit" class="btn-primario-sm btn-verde">
+                                    ✅ Registrar Movimentação
+                                </button>
+                                <button type="button" class="btn-secundario btn-limpar">
+                                    🗑 Limpar
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </section>
+
+                <!-- COLUNA DIREITA: Tabela de Estoque Atual (ordem alfabética) -->
+                <section class="secao" aria-label="Situação atual do estoque">
+                    <div class="secao-cabecalho">
+                        <h2 class="secao-titulo">
+                            <span class="secao-titulo-icone" aria-hidden="true">📋</span>
+                            Estoque Atual (Ordem Alfabética)
+                        </h2>
+                        <span class="badge badge-cafe" th:text="${#lists.size(produtos)} + ' produto(s)'"></span>
+                    </div>
+
+                    <div class="secao-corpo" style="padding: 0;">
+                        <div class="tabela-wrapper" style="padding: var(--xl);">
+                            <table class="tabela" id="tabela-estoque" aria-label="Situação atual do estoque">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Produto</th>
+                                    <th scope="col">Qtd. Atual</th>
+                                    <th scope="col">Est. Mínimo</th>
+                                    <th scope="col">Situação</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Produtos do banco de dados -->
+                                <tr th:each="p : ${produtos}" th:class="${p.quantidade != null && p.quantidade < (p.estoqueMinimo != null ? p.estoqueMinimo : 0) ? 'linha-critica' : p.quantidade != null && p.quantidade < ((p.estoqueMinimo != null ? p.estoqueMinimo : 0) * 1.5) ? 'linha-alerta' : ''}">
+                                    <td>
+                                        <p class="produto-nome" th:text="${p.nome}"></p>
+                                        <p class="produto-desc" th:text="${p.categoria}"></p>
+                                    </td>
+                                    <td><span class="qtd-numero" th:text="${p.quantidade != null ? p.quantidade : 0}"></span></td>
+                                    <td th:text="${p.estoqueMinimo != null ? p.estoqueMinimo : 0}"></td>
+                                    <td>
+                                        <span class="badge badge-ok" th:if="${p.quantidade == null || p.quantidade >= (p.estoqueMinimo != null ? p.estoqueMinimo : 0)}">✔ Boa</span>
+                                        <span class="badge badge-alerta" th:if="${p.quantidade != null && p.quantidade < (p.estoqueMinimo != null ? p.estoqueMinimo : 0) && p.quantidade > 0}">⚠ Baixo</span>
+                                        <span class="badge badge-alerta" th:if="${p.quantidade != null && p.quantidade == 0}">🚨 Crítico</span>
+                                    </td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+            <!-- /GRADE ESTOQUE -->
+
+            <!-- ══════════════════════════════════
+                 SEÇÃO: HISTÓRICO DE MOVIMENTAÇÕES
+            ══════════════════════════════════ -->
+            <section class="secao" aria-label="Histórico de movimentações">
+                <div class="secao-cabecalho">
+                    <h2 class="secao-titulo">
+                        <span class="secao-titulo-icone" aria-hidden="true">📜</span>
+                        Histórico de Movimentações
+                    </h2>
+                    <span class="badge badge-cafe">Últimas 10 movimentações</span>
+                </div>
+
+                <div class="secao-corpo" style="padding: 0;">
+                    <div class="tabela-wrapper" style="padding: var(--xl);">
+                        <table class="tabela" id="tabela-historico" aria-label="Histórico de movimentações">
+                            <thead>
+                            <tr>
+                                <th scope="col">Produto</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Quantidade</th>
+                                <th scope="col">Data</th>
+                                <th scope="col">Responsável</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- Histórico dinâmico do banco de dados -->
+                            <tr th:each="e : ${estoques}">
+                                <td>
+                                    <p class="produto-nome" th:text="${e.produtos != null && !e.produtos.isEmpty() ? e.produtos.get(0).nome : 'N/A'}"></p>
+                                </td>
+                                <td>
+                                    <span class="badge badge-entrada" th:if="${e.tipoMovimentacao == 'entrada'}">⬆ Entrada</span>
+                                    <span class="badge badge-saida" th:if="${e.tipoMovimentacao == 'saida'}">⬇ Saída</span>
+                                </td>
+                                <td><strong th:text="${e.quantidade}"></strong></td>
+                                <td th:text="${e.data !== null ? #temporals.format(e.data, 'dd/MM/yyyy') : '-'}"></td>
+                                <td th:text="${e.responsavel !== null ? e.responsavel : '-'}"></td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <!-- /HISTÓRICO -->
+
+        </main>
+
+        <!-- RODAPÉ -->
+        <footer class="pagina-rodape">
+            © 2025 Café Aroma &amp; Sabor · Sistema de Gestão de Estoque · Desenvolvido para uso interno
+        </footer>
+
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+    const btnMenu = document.getElementById('btn-menu-mobile');
+    if (btnMenu && window.innerWidth <= 768) btnMenu.style.display = 'block';
+</script>
+</body>
+</html>

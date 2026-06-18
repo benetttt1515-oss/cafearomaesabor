@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <!-- ============================================================
+       CAFÉ AROMA & SABOR — Sistema de Gestão de Estoque
+       index.html — Tela de Login
+       ============================================================ -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Café Aroma &amp; Sabor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ── PÁGINA DE LOGIN ─────────────────────────────────────────── -->
+<div class="login-pagina">
+
+  <!-- ── PAINEL ESQUERDO (identidade visual) ─────────────────── -->
+  <div class="login-painel-esquerdo" role="complementary" aria-label="Identidade visual da empresa">
+
+    <!-- Ícone de xícara animado -->
+    <div class="login-icone-cafe" aria-hidden="true">☕</div>
+
+    <!-- Nome da empresa -->
+    <h1 class="login-titulo-esquerdo">
+      Café<br />Aroma &amp; Sabor
+    </h1>
+
+    <!-- Linha decorativa -->
+    <div class="login-linha-deco" aria-hidden="true"></div>
+
+    <!-- Subtítulo / slogan -->
+    <p class="login-subtitulo-esquerdo">
+      Sistema de Gestão de Estoque<br />
+      para o almoxarifado da empresa.
+    </p>
+
+    <!-- Informações decorativas na parte inferior -->
+    <div style="position:absolute; bottom: 32px; display:flex; gap:24px; z-index:1;">
+      <div style="text-align:center;">
+        <span style="font-family:'Playfair Display',serif; font-size:1.4rem; color:#E8D5B7; display:block; font-weight:700;">+200</span>
+        <span style="font-size:0.7rem; color:#B8845A; text-transform:uppercase; letter-spacing:1px;">Produtos</span>
+      </div>
+      <div style="width:1px; background:rgba(212,184,150,.15);"></div>
+      <div style="text-align:center;">
+        <span style="font-family:'Playfair Display',serif; font-size:1.4rem; color:#E8D5B7; display:block; font-weight:700;">12</span>
+        <span style="font-size:0.7rem; color:#B8845A; text-transform:uppercase; letter-spacing:1px;">Categorias</span>
+      </div>
+      <div style="width:1px; background:rgba(212,184,150,.15);"></div>
+      <div style="text-align:center;">
+        <span style="font-family:'Playfair Display',serif; font-size:1.4rem; color:#E8D5B7; display:block; font-weight:700;">5+</span>
+        <span style="font-size:0.7rem; color:#B8845A; text-transform:uppercase; letter-spacing:1px;">Usuários</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PAINEL DIREITO (formulário) ─────────────────────────── -->
+  <main class="login-painel-direito">
+    <div class="login-formulario-wrapper">
+
+      <!-- Logo / nome para telas menores (painel esquerdo oculto) -->
+      <div class="login-logo">
+        <span class="login-logo-titulo">Café Aroma &amp; Sabor</span>
+
+        <span class="login-logo-sub">Sistema de Gestão de Estoque</span>
+      </div>
+
+      <!-- Mensagem de boas-vindas -->
+      <h2 class="login-boas_vindas">Bem-vindo de volta 👋</h2>
+      <p class="login-instrucao">Informe suas credenciais para acessar o sistema.</p>
+
+      <!-- ── FORMULÁRIO DE LOGIN ─────────────────────────────── -->
+      <form th:action="@{/login}" method="post">
+
+
+        <!-- Campo: Usuário -->
+        <div class="campo-grupo">
+          <label class="campo-label" for="campo-usuario">Usuário</label>
+          <div class="campo-wrapper">
+            <input
+                    class="campo-input"
+                    type="text"
+                    id="campo-usuario"
+                    name="username"
+                    placeholder="Digite seu usuário"
+                    autocomplete="username"
+                    aria-required="true"
+            />
+            <span class="campo-icone" aria-hidden="true">👤</span>
+          </div>
+        </div>
+
+        <!-- Campo: Senha -->
+        <div class="campo-grupo">
+          <label class="campo-label" for="campo-senha">Senha</label>
+          <div class="campo-wrapper">
+            <input
+                    class="campo-input"
+                    type="password"
+                    id="campo-senha"
+                    name="password"
+                    placeholder="Digite sua senha"
+                    autocomplete="current-password"
+                    aria-required="true"
+            />
+            <span class="campo-icone" aria-hidden="true">🔒</span>
+          </div>
+        </div>
+
+        <!-- Botão de login -->
+        <button
+                type="submit"
+                class="btn-primario"
+                id="btn-entrar"
+                aria-label="Entrar no sistema"
+        >
+          ☕ Entrar no Sistema
+        </button>
+
+      </form>
+      <!-- /FORMULÁRIO -->
+
+      <!-- Dica de acesso para demonstração -->
+      <p style="text-align:center; margin-top:20px; font-size:0.78rem; color:#B8845A;">
+        💡 <strong>Demo:</strong> Qualquer usuário e senha são aceitos.
+      </p>
+
+      <!-- Rodapé da tela de login -->
+      <p class="login-rodape">
+        © 2025 Café Aroma &amp; Sabor · Todos os direitos reservados
+      </p>
+
+    </div>
+  </main>
+  <!-- /PAINEL DIREITO -->
+
+</div>
+<!-- /LOGIN-PAGINA -->
+
+</body>
+</html>
